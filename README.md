@@ -1,4 +1,4 @@
-# ObRail Europe – API REST & Base de données
+﻿# ObRail Europe – API REST & Base de données
 ## MSPR TPRE612 – Bloc E6.1
 
 ---
@@ -6,10 +6,10 @@
 ## Structure du projet
 
 ```
-obrail/
-├── mpd_obrail.sql       # Schéma PostgreSQL complet (MPD)
-├── main.py              # API FastAPI
+ObRail_API/
+├── main_v3.py           # API FastAPI (version alignée à la spec API REST)
 ├── requirements.txt     # Dépendances Python
+├── tests/               # Tests API
 └── README.md
 ```
 
@@ -20,89 +20,65 @@ obrail/
 ### 1. Base de données PostgreSQL
 
 ```bash
-# Créer la base
+# Exemple (adapter user/password si besoin)
 psql -U postgres -c "CREATE DATABASE obrail_db;"
 psql -U postgres -c "CREATE USER obrail_user WITH PASSWORD 'obrail_pass';"
 psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE obrail_db TO obrail_user;"
-
-# Charger le schéma
-psql -U obrail_user -d obrail_db -f mpd_obrail.sql
 ```
 
-### 2. API FastAPI
+### 2. Variables d'environnement
+
+Créer un fichier `.env` à la racine :
+
+```env
+DATABASE_URL=postgresql://obrail_user:obrail_pass@localhost:5432/obrail_db
+```
+
+### 3. API FastAPI
 
 ```bash
 pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn main_v3:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 3. Documentation interactive
+### 4. Documentation interactive
 
 - Swagger UI : http://localhost:8000/docs
 - ReDoc      : http://localhost:8000/redoc
 
 ---
 
-## Endpoints principaux
+## Endpoints alignés avec la spec
 
-| Méthode | Endpoint                       | Description                              |
-|---------|--------------------------------|------------------------------------------|
-| GET     | `/`                            | Informations générales de l'API          |
-| GET     | `/trajets`                     | Liste des trajets (filtres disponibles)  |
-| GET     | `/trajets/{id}`                | Détail d'un trajet                       |
-| GET     | `/services`                    | Services ferroviaires                    |
-| GET     | `/gares`                       | Gares (filtre pays / ville)              |
-| GET     | `/emissions/stats`             | Stats CO₂ par type de train              |
-| GET     | `/emissions/trajets/{id}`      | Émissions d'un trajet                    |
-| GET     | `/imports`                     | Historique ETL + qualité                 |
-| GET     | `/operateurs`                  | Opérateurs et nb de services             |
-| GET     | `/sources`                     | Sources open data utilisées              |
-| GET     | `/dashboard`                   | KPIs tableau de bord                     |
+- `GET /trajets` (pagination + filtres)
+- `GET /trajets/{id_trajet}`
+- `GET /stats/kpi`
+- `GET /stats/volumes`
+- `GET /stats/comparatif-jour-nuit`
+- `GET /stats/co2`
+- `GET /stats/top-liaisons`
+- `GET /operateurs`
+- `GET /lignes`
+- `GET /gares`
+- `GET /pays`
+- `GET /imports`
+- `GET /imports/stats`
+- `GET /health`
+
+Compatibilité conservée :
+- `GET /dashboard`
+- `GET /emissions/stats`
+- `GET /localisations`
 
 ---
 
 ## Exemples de requêtes
 
 ```bash
-# Trajets de nuit SNCF
-curl "http://localhost:8000/trajets?type_train=nuit&operateur=SNCF"
-
-# Gares françaises
-curl "http://localhost:8000/gares?code_pays=FR"
-
-# Statistiques émissions
-curl "http://localhost:8000/emissions/stats"
-
-# Tableau de bord
-curl "http://localhost:8000/dashboard"
-
-# Imports avec score qualité
-curl "http://localhost:8000/imports?statut=succès"
+curl "http://localhost:8000/trajets?page=1&limit=15&type=jour"
+curl "http://localhost:8000/stats/kpi"
+curl "http://localhost:8000/stats/volumes?groupby=operateur"
+curl "http://localhost:8000/gares?code_pays=FR&search=Paris"
+curl "http://localhost:8000/imports?page=1&limit=20&statut=succès"
+curl "http://localhost:8000/health"
 ```
-
----
-
-## Variables d'environnement
-
-Créer un fichier `.env` à la racine :
-
-```
-DATABASE_URL=postgresql://obrail_user:obrail_pass@localhost:5432/obrail_db
-```
-
-Et modifier `main.py` :
-```python
-from dotenv import load_dotenv
-import os
-load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL")
-```
-
----
-
-## Conformité RGPD
-
-- Aucune donnée personnelle n'est collectée ou stockée.
-- Les sources de données sont exclusivement open data.
-- Traçabilité complète via `historique_import`.
-- Documentation transparente des sources et transformations.
