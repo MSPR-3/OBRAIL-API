@@ -15,7 +15,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgis/postgis:15-3.4
         env:
           POSTGRES_DB: obrail_test
           POSTGRES_USER: obrail_user

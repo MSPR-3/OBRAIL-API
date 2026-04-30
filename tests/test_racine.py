@@ -29,7 +29,7 @@ class TestRacine:
         data = response.json()
         assert "endpoints" in data
         assert "/stats/kpi" in data["endpoints"]
-        assert "/health" in data["endpoints"]
+        assert "/health"    in data["endpoints"]
 
     @pytest.mark.asyncio
     async def test_root_contient_documentation(self, client):
