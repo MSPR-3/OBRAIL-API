@@ -32,11 +32,11 @@ class TestLignes:
         data = response.json()
         if data["lignes"]:
             ligne = data["lignes"][0]
-            assert "id_ligne" in ligne
-            assert "nom_ligne" in ligne
-            assert "nb_trajets" in ligne
-            assert "operateurs" in ligne
-            assert "co2_moyen_kg" in ligne
+            assert "id_ligne"              in ligne
+            assert "nom_ligne"             in ligne
+            assert "nb_trajets"            in ligne
+            assert "operateurs"            in ligne
+            assert "co2_moyen_kg"          in ligne
             assert "duree_moyenne_minutes" in ligne
 
     @pytest.mark.asyncio

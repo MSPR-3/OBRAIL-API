@@ -2,7 +2,7 @@ import pytest
 import pytest_asyncio
 import asyncio
 from httpx import AsyncClient
-from main_v3 import app
+from main import app
 
 @pytest.fixture(scope="session")
 def event_loop():

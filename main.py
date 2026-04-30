@@ -15,11 +15,14 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
 # Logging setup
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 logger = logging.getLogger(__name__)
 
+
 load_dotenv()
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://obrail_user:test@localhost:5432/obrail_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
 database = databases.Database(DATABASE_URL)
 
 
