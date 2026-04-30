@@ -12,7 +12,18 @@ class TestGaresListe:
     @pytest.mark.asyncio
     async def test_gares_status(self, client):
         response = await client.get("/gares")
+<<<<<<< HEAD
         assert response.status_code == 200
+=======
+        assert response.status_code in (200, 404)
+        if response.status_code == 404:
+            data = response.json()
+            assert data["message"] == "Ressource non trouvée"
+            assert (
+                "Erreur récupération gares" in data["detail"]
+                or "Aucune gare trouvée" in data["detail"]
+            )
+>>>>>>> origin/main
 
     @pytest.mark.asyncio
     async def test_gares_retourne_conteneur(self, client):

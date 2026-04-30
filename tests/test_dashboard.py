@@ -39,9 +39,23 @@ class TestDashboard:
         assert data["total_gares"] >= 0
 
     @pytest.mark.asyncio
+<<<<<<< HEAD
     async def test_stats_kpi_equivalent(self, client):
         response = await client.get("/stats/kpi")
         assert response.status_code == 200
         data = response.json()
         assert data["total_trajets"] >= 0
         assert data["total_gares"] >= 0
+=======
+    async def test_dashboard_retourne_dict(self, client):
+        """GET /dashboard retourne un dictionnaire"""
+        response = await client.get("/dashboard")
+        assert isinstance(response.json(), dict)
+
+    @pytest.mark.asyncio
+    async def test_dashboard_total_gares_coherent(self, client):
+        """Le total_gares du dashboard est cohérent avec /gares"""
+        dashboard = await client.get("/dashboard")
+        await client.get("/gares?limit=500")
+        assert dashboard.json()["total_gares"] >= 0
+>>>>>>> origin/main

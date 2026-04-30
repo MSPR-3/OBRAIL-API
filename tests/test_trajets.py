@@ -11,8 +11,21 @@ class TestTrajetsListe:
 
     @pytest.mark.asyncio
     async def test_trajets_status(self, client):
+<<<<<<< HEAD
         response = await client.get('/trajets')
         assert response.status_code == 200
+=======
+        """GET /trajets retourne 200 ou 404 selon les données"""
+        response = await client.get("/trajets")
+        assert response.status_code in (200, 404)
+        if response.status_code == 404:
+            data = response.json()
+            assert data["message"] == "Ressource non trouvée"
+            assert (
+                "Erreur récupération trajets" in data["detail"]
+                or "Aucun trajet trouvé" in data["detail"]
+            )
+>>>>>>> origin/main
 
     @pytest.mark.asyncio
     async def test_trajets_retourne_pagination(self, client):

@@ -1,10 +1,12 @@
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+import sys
 
 import pytest
-from httpx import AsyncClient, ASGITransport
-from main_v3 import app, database
+from httpx import ASGITransport, AsyncClient
+
+from main import app, database
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 
 @pytest.fixture(autouse=True)
@@ -18,7 +20,6 @@ async def setup_db():
 @pytest.fixture
 async def client():
     async with AsyncClient(
-        transport=ASGITransport(app=app),
-        base_url="http://test"
+        transport=ASGITransport(app=app), base_url="http://test"
     ) as c:
         yield c
