@@ -256,8 +256,8 @@ async def get_trajets(
     count_query = f"""
         SELECT COUNT(*)
         FROM trajet t
-        LEFT JOIN gare gd ON t.id_gare_depart = gd.id_gare
-        LEFT JOIN gare ga ON t.id_gare_arrivee = ga.id_gare
+        JOIN gare gd ON t.id_gare_depart = gd.id_gare
+        JOIN gare ga ON t.id_gare_arrivee = ga.id_gare
         LEFT JOIN operateur o ON t.id_operateur = o.id_operateur
         {where}
     """
@@ -287,8 +287,8 @@ async def get_trajets(
         FROM trajet t
         LEFT JOIN ligne l ON t.id_ligne = l.id_ligne
         LEFT JOIN operateur o ON t.id_operateur = o.id_operateur
-        LEFT JOIN gare gd ON t.id_gare_depart = gd.id_gare
-        LEFT JOIN gare ga ON t.id_gare_arrivee = ga.id_gare
+        JOIN gare gd ON t.id_gare_depart = gd.id_gare
+        JOIN gare ga ON t.id_gare_arrivee = ga.id_gare
         {where}
         ORDER BY t.id_trajet
         LIMIT :limit OFFSET :offset
