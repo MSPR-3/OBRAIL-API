@@ -1,4 +1,4 @@
-"""
+﻿"""
 Tests: Imports ETL
 GET /imports
 """
@@ -10,67 +10,85 @@ class TestImports:
 
     @pytest.mark.asyncio
     async def test_imports_status_200(self, client):
-        """GET /imports retourne 200"""
-        response = await client.get("/imports")
+        response = await client.get('/imports')
         assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_imports_retourne_liste(self, client):
-        """GET /imports retourne une liste"""
-        response = await client.get("/imports")
-        assert isinstance(response.json(), list)
+    async def test_imports_retourne_pagination(self, client):
+        response = await client.get('/imports')
+        data = response.json()
+        assert isinstance(data, dict)
+        assert 'page' in data
+        assert 'limit' in data
+        assert 'total' in data
+        assert 'imports' in data
+        assert isinstance(data['imports'], list)
 
     @pytest.mark.asyncio
     async def test_imports_filtre_statut_succes(self, client):
-        """GET /imports?statut=succès retourne 200"""
-        response = await client.get("/imports?statut=succès")
+        response = await client.get('/imports?statut=succès')
         assert response.status_code == 200
 
     @pytest.mark.asyncio
     async def test_imports_filtre_statut_echec(self, client):
-        """GET /imports?statut=echec retourne 200"""
-        response = await client.get("/imports?statut=echec")
+        response = await client.get('/imports?statut=echec')
         assert response.status_code == 200
 
     @pytest.mark.asyncio
     async def test_imports_filtre_statut_partiel(self, client):
-        """GET /imports?statut=partiel retourne 200"""
-        response = await client.get("/imports?statut=partiel")
+        response = await client.get('/imports?statut=partiel')
         assert response.status_code == 200
 
     @pytest.mark.asyncio
+    async def test_imports_filtre_since(self, client):
+        response = await client.get('/imports?since=2024-01-01T00:00:00Z')
+        assert response.status_code in (200, 400)
+
+    @pytest.mark.asyncio
     async def test_imports_statut_invalide(self, client):
-        """GET /imports?statut=invalide retourne 400"""
-        response = await client.get("/imports?statut=invalide")
+        response = await client.get('/imports?statut=invalide')
         assert response.status_code == 400
 
     @pytest.mark.asyncio
     async def test_imports_pagination_limit(self, client):
-        """GET /imports?limit=5 retourne au max 5 imports"""
-        response = await client.get("/imports?limit=5")
+        response = await client.get('/imports?limit=5')
         assert response.status_code == 200
-        assert len(response.json()) <= 5
+        assert len(response.json()['imports']) <= 5
 
     @pytest.mark.asyncio
     async def test_imports_limit_zero(self, client):
-        """GET /imports?limit=0 retourne 422"""
-        response = await client.get("/imports?limit=0")
+        response = await client.get('/imports?limit=0')
         assert response.status_code == 422
 
     @pytest.mark.asyncio
     async def test_imports_champs_requis(self, client):
-        """GET /imports retourne les bons champs"""
-        response = await client.get("/imports")
-        if response.json():
-            data = response.json()[0]
-            assert "id_import" in data
-            assert "date_import" in data
-            assert "statut" in data
-            assert "nb_lignes_importees" in data
+        response = await client.get('/imports?limit=1')
+        data = response.json()
+        if data['imports']:
+            imp = data['imports'][0]
+            assert 'id_import' in imp
+            assert 'date_import' in imp
+            assert 'statut' in imp
+            assert 'nb_lignes_importees' in imp
 
     @pytest.mark.asyncio
     async def test_imports_nb_lignes_positif(self, client):
-        """GET /imports retourne des nb_lignes_importees >= 0"""
-        response = await client.get("/imports")
-        for imp in response.json():
-            assert imp["nb_lignes_importees"] >= 0
+        response = await client.get('/imports')
+        for imp in response.json()['imports']:
+            assert imp['nb_lignes_importees'] >= 0
+
+
+class TestImportsStats:
+
+    @pytest.mark.asyncio
+    async def test_imports_stats_status(self, client):
+        response = await client.get('/imports/stats')
+        assert response.status_code == 200
+        data = response.json()
+        assert 'total_imports' in data
+        assert 'imports_reussis' in data
+        assert 'imports_echoues' in data
+        assert 'imports_partiels' in data
+        assert 'taux_reussite' in data
+        assert 'dernier_import' in data
+        assert 'lignes_importees_total' in data

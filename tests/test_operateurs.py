@@ -1,5 +1,5 @@
 """
-Tests: Opérateurs
+Tests: Op?rateurs
 GET /operateurs
 """
 
@@ -10,37 +10,38 @@ class TestOperateurs:
 
     @pytest.mark.asyncio
     async def test_operateurs_status_200(self, client):
-        """GET /operateurs retourne 200"""
         response = await client.get("/operateurs")
         assert response.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_operateurs_retourne_liste(self, client):
-        """GET /operateurs retourne une liste"""
+    async def test_operateurs_retourne_conteneur(self, client):
         response = await client.get("/operateurs")
-        assert isinstance(response.json(), list)
+        data = response.json()
+        assert isinstance(data, dict)
+        assert "operateurs" in data
+        assert isinstance(data["operateurs"], list)
 
     @pytest.mark.asyncio
     async def test_operateurs_champs_requis(self, client):
-        """GET /operateurs retourne les bons champs"""
         response = await client.get("/operateurs")
-        if response.json():
-            data = response.json()[0]
-            assert "id_operateur" in data
-            assert "nom" in data
-            assert "nb_trajets" in data
+        data = response.json()
+        if data["operateurs"]:
+            op = data["operateurs"][0]
+            assert "id_operateur" in op
+            assert "nom" in op
+            assert "nb_trajets" in op
+            assert "nb_lignes" in op
 
     @pytest.mark.asyncio
     async def test_operateurs_tries_par_nb_trajets(self, client):
-        """GET /operateurs retourne les opérateurs triés par nb_trajets décroissant"""
         response = await client.get("/operateurs")
-        if len(response.json()) > 1:
-            trajets = [o["nb_trajets"] for o in response.json()]
+        data = response.json()["operateurs"]
+        if len(data) > 1:
+            trajets = [o["nb_trajets"] for o in data]
             assert trajets == sorted(trajets, reverse=True)
 
     @pytest.mark.asyncio
     async def test_operateurs_nb_trajets_positif(self, client):
-        """GET /operateurs retourne des nb_trajets >= 0"""
         response = await client.get("/operateurs")
-        for op in response.json():
+        for op in response.json()["operateurs"]:
             assert op["nb_trajets"] >= 0
