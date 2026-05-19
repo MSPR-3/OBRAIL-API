@@ -12,7 +12,7 @@
 Ce projet s'inscrit dans le cadre du **MSPR**, formation DIADS/DIA.
 L'API **OBRAIL Europe** est le backend central de l'observatoire des données ferroviaires européennes. Elle expose des endpoints REST asynchrones pour consulter les trajets, statistiques, opérateurs, lignes, gares et métriques environnementales.
 
----
+----
 
 ## Vue d'ensemble
 
@@ -46,7 +46,7 @@ L'API **OBRAIL Europe** est le backend central de l'observatoire des données fe
                     └─────────────┘
 ```
 
----
+----
 
 ## Stack Technique
 
