@@ -67,6 +67,19 @@ CREATE TABLE IF NOT EXISTS public.historique_import (
     )
 );
 
-CREATE INDEX IF NOT EXISTS idx_gare_pays       ON public.gare              (code_pays);
-CREATE INDEX IF NOT EXISTS idx_historique_date ON public.historique_import (date_import);
-CREATE INDEX IF NOT EXISTS idx_trajet_service  ON public.trajet             (id_service);
+CREATE TABLE IF NOT EXISTS public.model_artifact (
+    id_model               serial PRIMARY KEY,
+    created_at             timestamptz NOT NULL DEFAULT now(),
+    model_name             character varying(50) NOT NULL,
+    sklearn_version        character varying(20),
+    trained_on_import_date timestamp without time zone,
+    n_rows_train           integer,
+    metrics                jsonb,
+    artifact               bytea NOT NULL,
+    is_active              boolean NOT NULL DEFAULT true
+);
+
+CREATE INDEX IF NOT EXISTS idx_gare_pays          ON public.gare              (code_pays);
+CREATE INDEX IF NOT EXISTS idx_historique_date    ON public.historique_import (date_import);
+CREATE INDEX IF NOT EXISTS idx_trajet_service     ON public.trajet             (id_service);
+CREATE INDEX IF NOT EXISTS idx_model_artifact_active ON public.model_artifact (is_active, id_model DESC);
