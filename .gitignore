@@ -3,3 +3,13 @@
 __pycache__/
 *.pyc
 .coverage
+
+# Données brutes d'entraînement (trop volumineuses)
+data/*.csv
+data/*.csv.gz
+
+# Rapports et artefacts non essentiels
+artifacts/**/candidate_results.csv
+artifacts/**/test_predictions.csv
+artifacts/**/*.png
+artifacts/**/training_summary.json
