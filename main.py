@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from database.connection import database, lifespan  # `database` re-exported for tests/conftest.py
-from routers import compat, imports, predict, referentiels, stats, trajets
+from routers import avion, compat, imports, predict, referentiels, stats, trajets
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
@@ -103,4 +103,5 @@ app.include_router(stats.router)
 app.include_router(referentiels.router)
 app.include_router(imports.router)
 app.include_router(predict.router)
+app.include_router(avion.router)
 app.include_router(compat.router)
