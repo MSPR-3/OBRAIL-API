@@ -59,3 +59,16 @@ async def post_predict(payload: list[PredictInput]) -> PredictResponse:
         count=raw["count"],
         model_source=raw.get("model_source"),
     )
+
+
+@router.get(
+    "/model/info",
+    summary="Métadonnées du modèle actif",
+    description=(
+        "Renvoie la version du modèle actuellement servie (source base ou fichier), "
+        "son nom, sa date d'entraînement et ses métriques de test. Permet de vérifier "
+        "qu'un réentraînement a bien été pris en compte (rechargement à chaud)."
+    ),
+)
+async def get_model_info() -> dict:
+    return predict_service.get_model_info()

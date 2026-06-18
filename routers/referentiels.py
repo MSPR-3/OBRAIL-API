@@ -178,28 +178,37 @@ async def get_gares(
 
 @router.get("/pays")
 async def get_pays():
-    rows = await database.fetch_all(
+    # Deux requêtes simples au lieu d'un triple JOIN gare×localisation×trajet
+    # (jointure localisation sur code_pays seul -> produit cartésien -> timeout/500).
+    gares_rows = await database.fetch_all(
         """
         SELECT
             g.code_pays,
             MAX(l.nom_pays) AS nom_pays,
-            COUNT(DISTINCT g.id_gare) AS nb_gares,
-            COUNT(t.id_trajet) AS nb_trajets_depart
+            COUNT(DISTINCT g.id_gare) AS nb_gares
         FROM gare g
-        LEFT JOIN localisation l ON l.code_pays = g.code_pays
-        LEFT JOIN trajet t ON t.id_gare_depart = g.id_gare
+        LEFT JOIN localisation l ON l.code_pays = g.code_pays AND l.ville = g.ville
         GROUP BY g.code_pays
         ORDER BY g.code_pays
         """
     )
+    trajet_rows = await database.fetch_all(
+        """
+        SELECT g.code_pays, COUNT(*) AS nb
+        FROM trajet t
+        JOIN gare g ON t.id_gare_depart = g.id_gare
+        GROUP BY g.code_pays
+        """
+    )
+    nb_trajets = {r["code_pays"]: int(r["nb"]) for r in trajet_rows}
     return {
         "pays": [
             {
                 "code_pays": row["code_pays"],
                 "nom_pays": row["nom_pays"],
                 "nb_gares": int(row["nb_gares"]),
-                "nb_trajets_depart": int(row["nb_trajets_depart"]),
+                "nb_trajets_depart": nb_trajets.get(row["code_pays"], 0),
             }
-            for row in rows
+            for row in gares_rows
         ]
     }
