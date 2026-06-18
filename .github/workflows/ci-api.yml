@@ -42,7 +42,7 @@ jobs:
       - name: Configuration de Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'  # requis par scikit-learn 1.9.0 / numpy 2.4.x (alignés sur le Dockerfile)
 
       - name: Installation des dépendances
         run: |
